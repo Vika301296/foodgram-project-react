@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
+from users.models import Subscription, User
 from users.serializers import UserGetRetrieveSerializer
 
 from .custom_fields import Base64ImageField
@@ -20,6 +21,7 @@ class IngredientCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для добавления ингредиентов, используемый
     для добавления рецепта"""
     amount = serializers.IntegerField()
+    id = serializers.IntegerField()
 
     class Meta:
         model = RecipeIngredient
@@ -69,7 +71,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                     amount=amount
                 )
             )
-            RecipeIngredient.objects.bulk_create(ingredient_list)
+        RecipeIngredient.objects.bulk_create(ingredient_list)
         recipe.save()
         return recipe
 
@@ -104,11 +106,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                     'Количество ингредиента не может быть меньше 1'
                 )
             ingredients_list.append(ingredient.get('id'))
-        # if len(set(ingredients_list)) != len(ingredients_list):
-        #     raise serializers.ValidationError(
-        #         'В рецепт нельзя добавить одинаковые ингредиенты!'
-        #         'Увеличьте количество!'
-        #     )
+        if len(set(ingredients_list)) != len(ingredients_list):
+            raise serializers.ValidationError(
+                'В рецепт нельзя добавить одинаковые ингредиенты!'
+                'Увеличьте количество!'
+            )
         return data
 
     def to_representation(self, instance):
@@ -219,3 +221,39 @@ class FavouriteSerializer(serializers.ModelSerializer):
             instance.recipe,
             context={'request': request}
         ).data
+
+
+class SubscriptionsSerializer(serializers.ModelSerializer):
+    """Cериализатор, используемый для получения
+    списка авторов, на которых подписан пользователь."""
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('email', 'id',
+                  'username', 'first_name',
+                  'last_name', 'is_subscribed',
+                  'recipes', 'recipes_count')
+
+    def get_is_subscribed(self, obj):
+        return (
+            self.context.get('request').user.is_authenticated
+            and Subscription.objects.filter(user=self.context['request'].user,
+                                            author=obj).exists()
+        )
+
+    def get_recipes_count(self, obj):
+        return obj.recipes.count()
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        recipes_limit = None
+        if request:
+            recipes_limit = request.query_params.get('recipes_limit')
+        recipes = obj.recipes.all()
+        if recipes_limit:
+            recipes = obj.recipes.all()[:int(recipes_limit)]
+        return ShortRecipeSerializer(recipes, many=True,
+                                     context={'request': request}).data

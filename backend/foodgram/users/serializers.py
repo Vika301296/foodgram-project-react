@@ -80,26 +80,3 @@ class UserGetRetrieveSerializer(UserSerializer):
                     user=request.user, author=obj).exists()):
             return True
         return False
-
-
-# class UserSubscribeToRepresentationSerializer(UserGetRetrieveSerializer):
-#     """"Сериализатор, используемый для получения информации
-#     о подписках пользователя."""
-#     is_subscribed = serializers.SerializerMethodField()
-#     recipes = serializers.SerializerMethodField()
-#     recipes_count = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = User
-#         fields = ('email', 'id', 'username', 'first_name',
-#                   'last_name', 'is_subscribed', 'recipes', 'recipes_count')
-#         read_only_fields = ('email', 'username', 'first_name', 'last_name',
-#                             'is_subscribed', 'recipes', 'recipes_count')
-
-#     def get_recipes(self, obj):
-#         request = self.context.get('request')
-#         return ShortRecipeSerializer(recipes, many=True,
-#                                      context={'request': request}).data
-
-#     def get_recipes_count(self, obj):
-#         return obj.recipes.count()

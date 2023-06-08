@@ -5,6 +5,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from recipes.serializers import SubscriptionsSerializer
+
 from .models import Subscription, User
 from .serializers import UserSubscribeSerializer
 
@@ -22,7 +24,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
         if self.request.method == ('post'):
             serializer = UserSubscribeSerializer(
-                user, author, data=request.data, context={"request": request})
+                data={'user': user.pk, 'author': author.pk},
+                context={"request": request})
             serializer.is_valid(raise_exception=True)
             # Subscription.objects.create(user=user, author=author)
             serializer.save()
@@ -33,6 +36,13 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response({'detail': 'Вы отписаны от пользователя!'},
                         status=status.HTTP_204_NO_CONTENT)
 
-    # @action(methods=['get'], detail=False, url_path='subscriptions',
-    #         url_name='subscriptions', permission_classes=[IsAuthenticated])
-    # def subscriptions(self, request, user_id):
+    @action(methods=['get'], detail=False,
+            url_path='subscriptions',
+            url_name='subscriptions',
+            permission_classes=[IsAuthenticated],)
+    def subscriptions(self, request):
+        queryset = User.objects.filter(following__user=request.user)
+        page = self.paginate_queryset(queryset)
+        serializer = SubscriptionsSerializer(page, many=True,
+                                             context={'request': request})
+        return self.get_paginated_response(serializer.data)
