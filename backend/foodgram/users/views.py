@@ -20,7 +20,7 @@ class UserViewSet(viewsets.ModelViewSet):
             url_name='subscribe', permission_classes=[IsAuthenticated])
     def subscribe(self, request, pk):
         user = request.user
-        author = get_object_or_404(User, id=pk)
+        author = User.objects.get(id=pk)
 
         if self.request.method == ('post'):
             serializer = UserSubscribeSerializer(
