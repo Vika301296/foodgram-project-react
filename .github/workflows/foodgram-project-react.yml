@@ -17,7 +17,7 @@ jobs:
         run: | 
           python -m pip install --upgrade pip 
           pip install flake8 pep8-naming flake8-broken-line flake8-return flake8-isort
-          pip install -r foodgram-project-react/requirements.txt 
+          pip install -r foodgram-project-react/backend/requirements.txt 
   
       - name: Test with flake8
         run: |
@@ -40,9 +40,9 @@ jobs:
       - name: Push to Docker Hub 
         uses: docker/build-push-action@v2 
         with:
-          context: ./api_yamdb
+          context: ./backend
           push: true
-          tags: vika301296/foodgram-project-react:latest
+          tags: vika301296/foodgram:latest
     deploy:
       runs-on: ubuntu-latest
       needs: build_and_push_to_docker_hub
