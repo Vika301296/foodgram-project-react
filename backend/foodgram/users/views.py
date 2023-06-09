@@ -22,12 +22,11 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         author = User.objects.get(id=pk)
 
-        if self.request.method == ('post'):
+        if self.request.method == 'POST':
             serializer = UserSubscribeSerializer(
                 data={'user': user.pk, 'author': author.pk},
                 context={"request": request})
             serializer.is_valid(raise_exception=True)
-            # Subscription.objects.create(user=user, author=author)
             serializer.save()
             return Response(serializer.data,
                             status=status.HTTP_201_CREATED)
