@@ -1,6 +1,7 @@
+from djoser.views import UserViewSet
 from django.shortcuts import get_object_or_404
 from recipes.serializers import SubscriptionsSerializer
-from rest_framework import status, viewsets
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -9,10 +10,10 @@ from .models import Subscription, User
 from .serializers import UserSubscribeSerializer
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(UserViewSet):
 
-    queryset = User.objects.all()
-    http_method_names = ['post', 'delete']
+    # queryset = User.objects.all()
+    # http_method_names = ['post', 'delete']
 
     @action(methods=['post', 'delete'], detail=True, url_path='subscribe',
             url_name='subscribe', permission_classes=[IsAuthenticated])
