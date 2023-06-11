@@ -1,6 +1,7 @@
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
+
 from users.models import Subscription, User
 
 from ..recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,

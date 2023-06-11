@@ -6,6 +6,7 @@ from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+
 from users.models import Subscription, User
 
 from ..recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
