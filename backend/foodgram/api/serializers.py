@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
@@ -8,6 +7,7 @@ from ..recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
                               ShoppingCart, Tag)
 from .custom_fields import Base64ImageField
 from .models import Subscription, User
+from .utils import create_ingredient
 
 
 class UserSignUpSerializer(UserSerializer):
@@ -79,11 +79,9 @@ class UserGetRetrieveSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        if (request.user.is_authenticated
+        return (request.user.is_authenticated
                 and Subscription.objects.filter(
-                    user=request.user, author=obj).exists()):
-            return True
-        return False
+                    user=request.user, author=obj).exists())
 
 
 class TagSerialiser(serializers.ModelSerializer):
@@ -135,19 +133,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        ingredient_list = []
-        for ingredient in ingredients:
-            current_ingredient = get_object_or_404(Ingredient,
-                                                   id=ingredient.get('id'))
-            amount = ingredient.get('amount')
-            ingredient_list.append(
-                RecipeIngredient(
-                    recipe=recipe,
-                    ingredient=current_ingredient,
-                    amount=amount
-                )
-            )
-        RecipeIngredient.objects.bulk_create(ingredient_list)
+        create_ingredient(ingredients, recipe)
         recipe.save()
         return recipe
 
@@ -158,20 +144,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         instance.tags.set(tags)
         RecipeIngredient.objects.filter(recipe=instance).delete()
         super().update(instance, validated_data)
-        ingredient_list = []
-        for ingredient in ingredients:
-            current_ingredient = get_object_or_404(Ingredient,
-                                                   id=ingredient.get('id'))
-            amount = ingredient.get('amount')
-            ingredient_list.append(
-                RecipeIngredient(
-                    recipe=instance,
-                    ingredient=current_ingredient,
-                    amount=amount
-                )
-            )
-            RecipeIngredient.objects.bulk_create(ingredient_list)
-        instance.save()
+        create_ingredient(ingredients, instance)
         return instance
 
     def validate(self, data):
@@ -231,18 +204,14 @@ class RecipeGetRetrieveSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
-        if request.user.is_authenticated and Favourite.objects.filter(
-                user=request.user, recipe=obj).exists():
-            return True
-        return False
+        return (request.user.is_authenticated and Favourite.objects.filter(
+                user=request.user, recipe=obj).exists())
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
-        if (request.user.is_authenticated
+        return (request.user.is_authenticated
                 and ShoppingCart.objects.filter(
-                    user=request.user, recipe=obj).exists()):
-            return True
-        return False
+                    user=request.user, recipe=obj).exists())
 
 
 class ShortRecipeSerializer(serializers.ModelSerializer):

@@ -119,7 +119,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredient__name',
             'ingredient__measurement_unit'
-        ).order_by('ingredient__name').annotate(amount=Sum('amount'))
+        ).order_by('ingredient__name').annotate(final_amount=Sum('amount'))
         return list_ingredients(self, request, ingredients)
 
     @action(
@@ -130,14 +130,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk):
         return post_or_delete(
             request, pk, Favourite, FavouriteSerializer
-        )
-
-    @action(
-        detail=True,
-        methods=['post', 'delete'],
-        permission_classes=[IsAuthenticated, ]
-    )
-    def shopping_cart(self, request, pk):
-        return post_or_delete(
-            request, pk, ShoppingCart, ShoppingCartSerializer
         )

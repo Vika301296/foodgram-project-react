@@ -4,7 +4,14 @@ from django.shortcuts import HttpResponse
 from rest_framework import response, status
 from rest_framework.generics import get_object_or_404
 
-from ..recipes.models import Recipe
+from ..recipes.models import Recipe, RecipeIngredient
+
+# Не очень поняла тут про время. Ты мне отправил ссылку на кдокументацию
+# из Django, где используется тот же datetime. (Настройки в settings я
+# проверила, определение timezone у меня работает.)
+# Еще я увидела, что там упоминается timezone, но он используется для времени,
+# которое здесь не задействовано.
+# В общем, не мог бы ты, пожалуйста, пояснить этот пункт?:)
 
 
 def list_ingredients(self, request, ingredients):
@@ -45,3 +52,18 @@ def post_or_delete(request, pk, model, serializer_name):
         model, user=user, recipe=get_object_or_404(Recipe, id=pk)
     ).delete()
     return response.Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def create_ingredient(ingredients, recipe):
+    ingredient_list = []
+    for ingredient in ingredients:
+        current_ingredient = ingredient.id
+        amount = ingredient.get('amount')
+        ingredient_list.append(
+            RecipeIngredient(
+                recipe=recipe,
+                ingredient=current_ingredient,
+                amount=amount
+            )
+        )
+    RecipeIngredient.objects.bulk_create(ingredient_list)

@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from users.models import User
 
 
@@ -98,7 +99,8 @@ class RecipeIngredient(models.Model):
         Ingredient,
         on_delete=models.CASCADE,
         related_name='recipeingredient',
-        verbose_name='Ингредиент'
+        verbose_name='Ингредиент',
+        unique=True
     )
     amount = models.PositiveIntegerField(
         verbose_name='Количество ингредиента',
@@ -119,7 +121,8 @@ class RecipeTag(models.Model):
         Recipe,
         on_delete=models.CASCADE,
         related_name='recipetag',
-        verbose_name='Рецепт')
+        verbose_name='Рецепт',
+        unique=True)
 
     tag = models.ForeignKey(
         Tag,
