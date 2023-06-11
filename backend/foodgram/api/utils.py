@@ -4,7 +4,7 @@ from django.shortcuts import HttpResponse
 from rest_framework import response, status
 from rest_framework.generics import get_object_or_404
 
-from .models import Recipe
+from ..recipes.models import Recipe
 
 
 def list_ingredients(self, request, ingredients):
