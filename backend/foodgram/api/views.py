@@ -6,7 +6,6 @@ from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-
 from users.models import Subscription, User
 
 from ..recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
@@ -90,24 +89,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated, ]
     )
     def shopping_cart(self, request, pk):
-        recipe = get_object_or_404(Recipe, id=pk)
-        if request.method == 'post':
-            serializer = ShoppingCartSerializer(
-                data={'user': request.user.id,
-                      'recipe': recipe.id, },
-                context={'request': request})
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        if not ShoppingCart.objects.filter(user=request.user,
-                                           recipe=recipe).exists():
-            return Response(
-                {'errors': 'Данный рецепт не находится в списке покупок!'},
-                status=status.HTTP_400_BAD_REQUEST)
-        ShoppingCart.objects.filter(
-            user=request.user, recipe=recipe).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return post_or_delete(request, pk,
+                              ShoppingCart, ShoppingCartSerializer)
 
     @action(
         detail=False,
