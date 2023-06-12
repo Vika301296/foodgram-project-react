@@ -6,13 +6,6 @@ from rest_framework.generics import get_object_or_404
 
 from ..recipes.models import Recipe, RecipeIngredient
 
-# Не очень поняла тут про время. Ты мне отправил ссылку на кдокументацию
-# из Django, где используется тот же datetime. (Настройки в settings я
-# проверила, определение timezone у меня работает.)
-# Еще я увидела, что там упоминается timezone, но он используется для времени,
-# которое здесь не задействовано.
-# В общем, не мог бы ты, пожалуйста, пояснить этот пункт?:)
-
 
 def list_ingredients(self, request, ingredients):
     user = self.request.user
