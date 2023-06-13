@@ -114,7 +114,11 @@ class RecipeIngredient(models.Model):
     class Meta:
         verbose_name = 'Ингредиент в рецепте'
         verbose_name_plural = 'Ингредиенты в рецепте'
-        unique_together = ('recipe', 'ingredient')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'], name='unique_ingredient'
+            )
+        ]
 
 
 class RecipeTag(models.Model):
@@ -134,7 +138,11 @@ class RecipeTag(models.Model):
     class Meta:
         verbose_name = 'Тэг рецепта'
         verbose_name_plural = 'Тэги рецепта'
-        unique_together = ('recipe', 'tag')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'tag'], name='unique_tag'
+            )
+        ]
 
 
 class Favourite(models.Model):

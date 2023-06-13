@@ -103,7 +103,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredient__name',
             'ingredient__measurement_unit'
-        ).order_by('ingredient__name').annotate(final_amount=Sum('amount'))
+        ).order_by('ingredient__name').annotate(
+            final_amount=Sum('amount'))
         return list_ingredients(self, request, ingredients)
 
     @action(
