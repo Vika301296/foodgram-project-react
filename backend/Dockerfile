@@ -10,6 +10,6 @@ RUN pip3 install psycopg2-binary
 
 RUN pip3 install -r /app/requirements.txt --no-cache-dir
 
-COPY . .
+COPY foodgram/ .
 
 CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "0:8000" ]
