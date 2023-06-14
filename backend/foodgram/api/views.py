@@ -8,8 +8,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from users.models import Subscription, User
 
-from ..recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
-                              ShoppingCart, Tag)
+from recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
 from .filters import RecipeFilter
 from .permissions import IsAdminAuthorOrReadOnly
 from .serializers import (FavouriteSerializer, IngredientGetRetrieveSerializer,
