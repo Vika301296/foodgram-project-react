@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework import response, status
 from rest_framework.generics import get_object_or_404
 
-from ..recipes.models import Recipe, RecipeIngredient
+from recipes.models import Recipe, RecipeIngredient
 
 
 def list_ingredients(self, request, ingredients):
