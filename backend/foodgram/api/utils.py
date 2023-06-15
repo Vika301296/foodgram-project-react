@@ -1,8 +1,23 @@
+import webcolors
+
 from django.shortcuts import HttpResponse
 from django.utils import timezone
-from recipes.models import Recipe, RecipeIngredient
-from rest_framework import response, status
+from recipes.models import Ingredient, Recipe, RecipeIngredient
+from rest_framework import response, serializers, status
 from rest_framework.generics import get_object_or_404
+
+
+class Hex2NameColor(serializers.Field):
+
+    def to_representation(self, value):
+        return value
+
+    def to_internal_value(self, data):
+        try:
+            data = webcolors.hex_to_name(data)
+        except ValueError:
+            raise serializers.ValidationError('Для этого цвета нет имени')
+        return data
 
 
 def list_ingredients(self, request, ingredients):
@@ -48,7 +63,8 @@ def post_or_delete(request, pk, model, serializer_name):
 def create_ingredient(ingredients, recipe):
     ingredient_list = []
     for ingredient in ingredients:
-        current_ingredient = ingredient.id
+        current_ingredient = get_object_or_404(Ingredient,
+                                               id=ingredient.get('id'))
         amount = ingredient.get('amount')
         ingredient_list.append(
             RecipeIngredient(

@@ -4,13 +4,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
-from rest_framework import filters, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from users.models import Subscription, User
 
-from .filters import RecipeFilter
+from .filters import IngredientFilter, RecipeFilter
 from .permissions import IsAdminAuthorOrReadOnly
 from .serializers import (FavouriteSerializer, IngredientGetRetrieveSerializer,
                           RecipeCreateSerializer, RecipeGetRetrieveSerializer,
@@ -23,9 +23,9 @@ class UserViewSet(UserViewSet):
 
     @action(methods=['post', 'delete'], detail=True, url_path='subscribe',
             url_name='subscribe', permission_classes=[IsAuthenticated])
-    def subscribe(self, request, pk):
+    def subscribe(self, request, id):
         user = request.user
-        author = User.objects.get(pk=pk)
+        author = User.objects.get(pk=id)
 
         if self.request.method == 'POST':
             serializer = UserSubscribeSerializer(
@@ -66,8 +66,9 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientGetRetrieveSerializer
     permission_classes = (AllowAny, )
     pagination_class = None
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('^name',)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = IngredientFilter
+    search_fields = ('^name', )
 
 
 class RecipeViewSet(viewsets.ModelViewSet):

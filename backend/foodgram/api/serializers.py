@@ -6,7 +6,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from users.models import Subscription, User
 
 from .custom_fields import Base64ImageField
-from .utils import create_ingredient
+from .utils import create_ingredient, Hex2NameColor
 
 
 class UserSignUpSerializer(UserSerializer):
@@ -85,9 +85,11 @@ class UserGetRetrieveSerializer(UserSerializer):
 
 class TagSerialiser(serializers.ModelSerializer):
     """Сериализатор тегов"""
+    color = Hex2NameColor()
+
     class Meta:
         model = Tag
-        fields = ('id', 'name', 'colour', 'slug')
+        fields = ('id', 'name', 'color', 'slug')
 
 
 class IngredientCreateSerializer(serializers.ModelSerializer):
