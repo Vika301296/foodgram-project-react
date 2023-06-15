@@ -44,6 +44,11 @@ docker-compose exec web python3 manage.py migrate
 docker-compose exec web python3 manage.py collectstatic --no-input
 ```
 
+- Заполните БД ингредиентами
+```
+docker-compose exec web python3 manage.py load_inhredients
+```
+
 - Создайте суперпользователя командой:
 ```
 docker-compose exec web python3 manage.py createsuperuser
