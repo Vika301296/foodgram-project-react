@@ -1,10 +1,10 @@
 from djoser.serializers import UserSerializer
-from recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
-                            ShoppingCart, Tag)
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-from users.models import Subscription, User
 
+from recipes.models import (Favourite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
+from users.models import Subscription, User
 from .custom_fields import Base64ImageField
 from .utils import Hex2NameColor, create_ingredient
 
@@ -75,12 +75,14 @@ class UserGetRetrieveSerializer(UserSerializer):
         model = User
         fields = ('email', 'id', 'username', 'first_name',
                   'last_name', 'is_subscribed')
+        read_only_fields = ('is_subscribed',)
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        return (request.user.is_authenticated
-                and Subscription.objects.filter(
-                    user=request.user, author=obj).exists())
+        return (
+            self.context.get('request').user.is_authenticated
+            and Subscription.objects.filter(user=self.context['request'].user,
+                                            author=obj).exists()
+        )
 
 
 class TagSerialiser(serializers.ModelSerializer):
